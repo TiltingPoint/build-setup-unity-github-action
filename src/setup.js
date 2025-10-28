@@ -36,6 +36,7 @@ async function run() {
 
 async function installUnityHub(selfHosted) {
     let unityHubPath = '';
+    let archFlag = '';
     if (process.platform === 'linux') {
 
         unityHubPath = `${process.env.HOME}/Unity Hub/UnityHub.AppImage`;
@@ -64,6 +65,10 @@ async function installUnityHub(selfHosted) {
             await execute(`hdiutil detach "/Volumes/${hubVolume}"`, { sudo: !selfHosted });
             await execute(`rm "${installerPath}"`);
         }
+        const arch = (await execute('uname -m')).trim();
+        if (arch === 'arm64' || arch === 'aarch64') archFlag = '--architecture AppleSilicon';
+        else if (arch === 'x86_64') archFlag = '--architecture Intel';
+        else archFlag = '--architecture AppleSilicon';
 
     } else if (process.platform === 'win32') {
 
@@ -89,7 +94,7 @@ async function installUnityEditor(unityHubPath, installPath, unityVersion, unity
             }
             await executeHub(unityHubPath, `install-path --set "${installPath}"`);
         }
-        await executeHub(unityHubPath, `install --version ${unityVersion} --changeset ${unityVersionChangeset}`);
+        await executeHub(unityHubPath, `install --version ${unityVersion} --changeset ${unityVersionChangeset} ${archFlag}`);
         unityPath = await findUnity(unityHubPath, unityVersion);
         if (!unityPath) {
             throw new Error('unity editor installation failed');
