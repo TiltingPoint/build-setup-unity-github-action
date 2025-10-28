@@ -94,9 +94,9 @@ async function installUnityEditor(unityHubPath, installPath, unityVersion, unity
         let archFlag = '';
         if (process.platform === 'darwin') {
             const arch = (await execute('uname -m')).trim();
-            if (arch === 'arm64' || arch === 'aarch64') archFlag = '--architecture AppleSilicon';
-            else if (arch === 'x86_64') archFlag = '--architecture Intel';
-            else archFlag = '--architecture AppleSilicon';
+            if (arch === 'arm64' || arch === 'aarch64') archFlag = '--architecture arm64';
+            else if (arch === 'x86_64') archFlag = '--architecture x86_64';
+            else archFlag = '--architecture arm64';
         }
 
         await executeHub(unityHubPath, `install --version ${unityVersion} --changeset ${unityVersionChangeset} ${archFlag}`);
